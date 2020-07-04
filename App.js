@@ -20,6 +20,7 @@ const App = () => {
     <View style={styles.contenedor}>
       <Text style={styles.titulo}>Administrador de Citas</Text>
 
+      <Formulario />
 
       <Text style={styles.titulo}>
         {citas.length > 0
@@ -27,7 +28,7 @@ const App = () => {
           : 'No hay Citas, Agrega una :D'}
       </Text>
 
-      
+
       <FlatList
         data={citas}
         renderItem={({item}) => (
