@@ -1,10 +1,25 @@
 import React, {useState} from 'react';
-import {Text, StyleSheet, View, TextInput, Button} from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  View,
+  TextInput,
+  Button,
+  TouchableHighlight,
+  Alert,
+  ScrollView
+} from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import shortid from 'shortid';
 
-const Formulario = () => {
+const Formulario = ({citas,setCitas,guardarMostrarForm}) => {
   const [fecha, guardarFecha] = useState('');
   const [hora, guardarHora] = useState('');
+
+  const [paciente, guardarPaciente] = useState('');
+  const [propietario, guardarPropietario] = useState('');
+  const [telefono, guardarTelefono] = useState('');
+  const [sintomas, guardarSintomas] = useState('');
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
@@ -18,8 +33,8 @@ const Formulario = () => {
   };
 
   const confirmarFecha = date => {
-    const opciones= {year:'numeric',month:'long', day: '2-digit'};
-    guardarFecha(date.toLocaleDateString('es-CO',opciones));
+    const opciones = {year: 'numeric', month: 'long', day: '2-digit'};
+    guardarFecha(date.toLocaleDateString('es-CO', opciones));
     hideDatePicker();
   };
 
@@ -34,19 +49,56 @@ const Formulario = () => {
   };
 
   const confirmarHora = date => {
-    const opciones = { hour: '2-digit', minute: '2-digit' }
-    guardarHora(date.toLocaleTimeString('es-CO',opciones));
+    const opciones = {hour: '2-digit', minute: '2-digit'};
+    guardarHora(date.toLocaleTimeString('es-CO', opciones));
     hideTimePicker();
   };
 
+  // Crear nueva cita
+  const crearNuevaCita = () => {
+      console.log("Desde crear nueva cita ");
+        // Validar espacios
+        if (propietario.trim() === '' || paciente.trim() === '' || telefono.trim() === '' || hora.trim() === '' || fecha.trim() === ''
+        || sintomas.trim() === ''){
+            mostrarAlerta();
+
+        }
+
+        const cita = {propietario,paciente,telefono,hora,fecha,sintomas}
+        cita.id = shortid.generate();
+
+        //Agregar cita al state
+
+        const citasNuevo = [...citas,cita]; //Aqui adiciona cita a la lista de citas que manda via props
+        setCitas(citasNuevo);
+
+        //Ocultar el formulario
+        guardarMostrarForm(false);
+
+        //Resetear el formulario
+
+  }
+
+  const mostrarAlerta = () =>{
+      Alert.alert(
+          'Error', //titulo
+          'Todos los campos son obligatorios', //Mensaje
+          [{
+              text: 'OK' //Arrego de botones
+          }]
+      );
+  }
+
+  
+
   return (
     <>
-      <View style={styles.formulario}>
+      <ScrollView style={styles.formulario}>
         <View>
           <Text style={styles.label}>Paciente:</Text>
           <TextInput
             style={styles.input}
-            onChangeText={texto => console.log(texto)}
+            onChangeText={texto => guardarPaciente(texto)}
           />
         </View>
 
@@ -54,7 +106,7 @@ const Formulario = () => {
           <Text style={styles.label}>Dueño:</Text>
           <TextInput
             style={styles.input}
-            onChangeText={texto => console.log(texto)}
+            onChangeText={texto => guardarPropietario(texto)}
           />
         </View>
 
@@ -62,7 +114,7 @@ const Formulario = () => {
           <Text style={styles.label}> Telefono Contacto:</Text>
           <TextInput
             style={styles.input}
-            onChangeText={texto => console.log(texto)}
+            onChangeText={texto => guardarTelefono(texto)}
             keyboardType={'phone-pad'}
           />
         </View>
@@ -80,8 +132,6 @@ const Formulario = () => {
             confirmTextIOS="Confirmar"
           />
           <Text>{fecha}</Text>
-
-
         </View>
 
         <View>
@@ -106,10 +156,18 @@ const Formulario = () => {
           <TextInput
             multiline
             style={styles.input}
-            onChangeText={texto => console.log(texto)}
+            onChangeText={texto => guardarSintomas(texto)}
           />
         </View>
-      </View>
+
+        <View>
+          <TouchableHighlight
+            onPress={() => crearNuevaCita()}
+            style={styles.btnSubmit}>
+            <Text style={styles.textoSubmit}> Submit &times;</Text>
+          </TouchableHighlight>
+        </View>
+      </ScrollView>
     </>
   );
 };
@@ -119,7 +177,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    marginHorizontal: '2.5%',
+    
   },
   label: {
     fontWeight: 'bold',
@@ -132,6 +190,16 @@ const styles = StyleSheet.create({
     borderColor: '#e1e1e1',
     borderWidth: 1,
     borderStyle: 'solid',
+  },
+  btnSubmit: {
+    padding: 10,
+    backgroundColor: '#7d024e',
+    marginVertical: 10,
+  },
+  textoSubmit: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 export default Formulario;
